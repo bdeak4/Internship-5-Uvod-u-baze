@@ -38,6 +38,11 @@ CREATE TABLE SurgeonSpecialties (
 	Title nvarchar(150) NOT NULL
 )
 
+CREATE TABLE Places (
+	Id int IDENTITY(1, 1) PRIMARY KEY,
+	Title nvarchar(150) NOT NULL
+)
+
 CREATE TABLE Surgeons (
 	Id int IDENTITY(1, 1) PRIMARY KEY,
 	OIB nvarchar(11) UNIQUE NOT NULL,
@@ -46,17 +51,13 @@ CREATE TABLE Surgeons (
 	HomeAddress nvarchar(50) NOT NULL,
 	EmailAddress nvarchar(50) UNIQUE NOT NULL,
 	PhoneNumber nvarchar(50) UNIQUE NOT NULL,
-	SurgeonSpecialtyId int FOREIGN KEY REFERENCES SurgeonSpecialties(Id) NOT NULL
+	SurgeonSpecialtyId int FOREIGN KEY REFERENCES SurgeonSpecialties(Id) NOT NULL,
+	PlaceOfBirth int FOREIGN KEY REFERENCES Places(Id) NOT NULL
 )
 
 CREATE TABLE OperationTypes (
 	Id int IDENTITY(1, 1) PRIMARY KEY,
 	Description nvarchar(150) NOT NULL
-)
-
-CREATE TABLE Places (
-	Id int IDENTITY(1, 1) PRIMARY KEY,
-	Title nvarchar(150) NOT NULL
 )
 
 CREATE TABLE Operations (
@@ -96,19 +97,19 @@ INSERT INTO SurgeonSpecialties (Title) VALUES
 ('Traumatologija'),
 ('Neurokirurgija')
 
-INSERT INTO Surgeons (FirstName, LastName, HomeAddress, OIB, EmailAddress, PhoneNumber, SurgeonSpecialtyId) VALUES
-('Ivan', 'Ivancic', 'Ante Starcevica 82', '93549648445', 'iivancic02@gmail.com', '0991234565', 1),
-('Mate', 'Matic',   'Marka Marulica 29',  '49240059499', 'mmatic@gmail.com',     '0981234564', 2),
-('Ante', 'Antic',   'Stjepana Radica 90', '01372373813', 'aantic@gmail.com',     '0981234566', 2)
+INSERT INTO Places (Title) VALUES
+('Split'),
+('Zagreb')
+
+INSERT INTO Surgeons (FirstName, LastName, HomeAddress, OIB, EmailAddress, PhoneNumber, SurgeonSpecialtyId, PlaceOfBirth) VALUES
+('Ivan', 'Ivancic', 'Ante Starcevica 82', '93549648445', 'iivancic02@gmail.com', '0991234565', 1, 1),
+('Mate', 'Matic',   'Marka Marulica 29',  '49240059499', 'mmatic@gmail.com',     '0981234564', 2, 2),
+('Ante', 'Antic',   'Stjepana Radica 90', '01372373813', 'aantic@gmail.com',     '0981234566', 2, 1)
 
 INSERT INTO OperationTypes (Description) VALUES
 ('Operacija popravka koljena'),
 ('Operacija popravka lakta'),
 ('Operacija popravka mozga')
-
-INSERT INTO Places (Title) VALUES
-('Split'),
-('Zagreb')
 
 INSERT INTO Operations (OperatingRoomId, OperationTypeId, PatientId, SurgeonId, DateAndTime, PlaceId) VALUES
 ('O301', 3, 1, 2, '2021-12-11 17:00:00', 2),
@@ -119,4 +120,32 @@ INSERT INTO Operations (OperatingRoomId, OperationTypeId, PatientId, SurgeonId, 
 
 -- queries -------------------------------------------------------------
 
+SELECT *
+FROM Operations
+WHERE DateAndTime LIKE '2021-12-12%'
+ORDER BY DateAndTime
 
+SELECT FirstName, LastName
+FROM Surgeons
+WHERE PlaceOfBirth IN (
+	SELECT Id
+	FROM Places
+	WHERE Title != 'Split'
+)
+
+-- soba 4 = C502
+--SELECT * FROM Nurses WHERE RoomId IN ('C502', 'A102')
+UPDATE Nurses
+SET RoomId = 'A102'
+WHERE RoomId = 'C502'
+--SELECT * FROM Nurses WHERE RoomId IN ('C502', 'A102')
+
+-- soba 7 = A100
+SELECT Id, OIB, FirstName, LastName
+FROM Patients
+WHERE RoomId = 'A100'
+ORDER BY LastName DESC
+
+SELECT *
+FROM Operations
+WHERE DateAndTime LIKE (CAST(CAST(GETDATE() AS date) AS varchar) + '%')
