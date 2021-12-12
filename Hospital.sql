@@ -2,6 +2,8 @@ CREATE DATABASE Hospital
 
 USE Hospital
 
+-- schema -------------------------------------------------------------
+
 CREATE TABLE Rooms (
 	Id nvarchar(4) PRIMARY KEY
 )
@@ -44,7 +46,7 @@ CREATE TABLE Surgeons (
 	HomeAddress nvarchar(50) NOT NULL,
 	EmailAddress nvarchar(50) UNIQUE NOT NULL,
 	PhoneNumber nvarchar(50) UNIQUE NOT NULL,
-	SurgeonSpecialtyId int FOREIGN KEY REFERENCES SurgeonSpecialties(Id)
+	SurgeonSpecialtyId int FOREIGN KEY REFERENCES SurgeonSpecialties(Id) NOT NULL
 )
 
 CREATE TABLE OperationTypes (
@@ -59,10 +61,62 @@ CREATE TABLE Places (
 
 CREATE TABLE Operations (
 	Id int IDENTITY(1, 1) PRIMARY KEY,
-	OperatingRoomId nvarchar(4) FOREIGN KEY REFERENCES OperatingRooms(Id),
-	OperationTypeId int FOREIGN KEY REFERENCES OperationTypes(Id),
-	PatientId int FOREIGN KEY REFERENCES Patients(Id),
-	SurgeonId int FOREIGN KEY REFERENCES Surgeons(Id),
+	OperatingRoomId nvarchar(4) FOREIGN KEY REFERENCES OperatingRooms(Id) NOT NULL,
+	OperationTypeId int FOREIGN KEY REFERENCES OperationTypes(Id) NOT NULL,
+	PatientId int FOREIGN KEY REFERENCES Patients(Id) NOT NULL,
+	SurgeonId int FOREIGN KEY REFERENCES Surgeons(Id) NOT NULL,
 	DateAndTime datetime2 DEFAULT GETDATE(),
-	PlaceId int FOREIGN KEY REFERENCES Places(Id)
+	PlaceId int FOREIGN KEY REFERENCES Places(Id) NOT NULL
 )
+
+-- seed ---------------------------------------------------------------
+
+INSERT INTO Rooms (Id) VALUES
+('A100'),
+('A102'),
+('C502')
+
+INSERT INTO OperatingRooms (Id) VALUES
+('O104'),
+('O301'),
+('O402')
+
+INSERT INTO Patients (FirstName, LastName, HomeAddress, OIB, RoomId) VALUES
+('Ante',   'Antic',  'Ante Starcevica 12',  '59922301982', 'A100'),
+('Ana',    'Anic',   'Marka Marulica 102',  '15945174455', 'A100'),
+('Marko',  'Markic', 'Stjepana Radica 49',  '38267061609', 'A100'),
+('Marica', 'Maric',  'Ivana Mazuranica 28', '31963106797', 'C502')
+
+INSERT INTO Nurses (FirstName, LastName, HomeAddress, OIB, EmailAddress, PhoneNumber, RoomId, OperatingRoomId) VALUES
+('Ivana',  'Ivancic', 'Ante Starcevica 61',  '08879487241', 'iivancic@gmail.com', '0991234567', 'A100', NULL),
+('Sanja',  'Sanjic',  'Marka Marulica 2',    '26203621754', 'ssanjic@gmail.com',  '0981234562', NULL,   'O104'),
+('Marica', 'Maric',   'Ivana Mazuranica 28', '30926315347', 'mmaric@gmail.com',   '0951234561', 'C502', 'O402')
+
+INSERT INTO SurgeonSpecialties (Title) VALUES
+('Traumatologija'),
+('Neurokirurgija')
+
+INSERT INTO Surgeons (FirstName, LastName, HomeAddress, OIB, EmailAddress, PhoneNumber, SurgeonSpecialtyId) VALUES
+('Ivan', 'Ivancic', 'Ante Starcevica 82', '93549648445', 'iivancic02@gmail.com', '0991234565', 1),
+('Mate', 'Matic',   'Marka Marulica 29',  '49240059499', 'mmatic@gmail.com',     '0981234564', 2),
+('Ante', 'Antic',   'Stjepana Radica 90', '01372373813', 'aantic@gmail.com',     '0981234566', 2)
+
+INSERT INTO OperationTypes (Description) VALUES
+('Operacija popravka koljena'),
+('Operacija popravka lakta'),
+('Operacija popravka mozga')
+
+INSERT INTO Places (Title) VALUES
+('Split'),
+('Zagreb')
+
+INSERT INTO Operations (OperatingRoomId, OperationTypeId, PatientId, SurgeonId, DateAndTime, PlaceId) VALUES
+('O301', 3, 1, 2, '2021-12-11 17:00:00', 2),
+('O104', 1, 2, 1, '2021-12-11 18:00:00', 1),
+('O402', 3, 3, 3, '2021-12-12 17:00:00', 1),
+('O301', 2, 4, 1, '2021-12-12 18:00:00', 1),
+('O301', 1, 2, 1, '2021-12-13 09:00:00', 1)
+
+-- queries -------------------------------------------------------------
+
+
