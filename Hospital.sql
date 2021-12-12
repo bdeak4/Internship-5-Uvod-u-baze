@@ -22,6 +22,11 @@ CREATE TABLE Patients (
 CREATE TABLE Nurses (
 	Id int IDENTITY(1, 1) PRIMARY KEY,
 	OIB nvarchar(11) UNIQUE NOT NULL,
+	FirstName nvarchar(50) NOT NULL,
+	LastName nvarchar(50) NOT NULL,
+	HomeAddress nvarchar(50) NOT NULL,
+	EmailAddress nvarchar(50) UNIQUE NOT NULL,
+	PhoneNumber nvarchar(50) UNIQUE NOT NULL,
 	RoomId nvarchar(4) FOREIGN KEY REFERENCES Rooms(Id),
 	OperatingRoomId nvarchar(4) FOREIGN KEY REFERENCES OperatingRooms(Id)
 )
